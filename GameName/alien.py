@@ -8,13 +8,16 @@ class Alien:
         self.x = x
         self.game = game
         self.y = y
-        self.size = 30
+        self.size = 20
 
-    def draw(self, wave):
+    def draw(self, difficulty):
         pygame.draw.rect(self.game.screen,
                          (81, 43, 88),
                          pygame.Rect(self.x, self.y, self.size, self.size))
-        self.speed = wave+0.05
+        if difficulty == 1:
+            self.speed = 0.1
+        elif difficulty == 2:
+            self.speed = 1
         self.y += self.speed
 
     def checkCollision(self, game):
