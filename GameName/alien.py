@@ -1,0 +1,25 @@
+import pygame
+
+
+class Alien:
+    speed = 0
+
+    def __init__(self, game, x, y):
+        self.x = x
+        self.game = game
+        self.y = y
+        self.size = 30
+
+    def draw(self, wave):
+        pygame.draw.rect(self.game.screen,
+                         (81, 43, 88),
+                         pygame.Rect(self.x, self.y, self.size, self.size))
+        self.speed = wave+0.05
+        self.y += self.speed
+
+    def checkCollision(self, game):
+        for rocket in game.rockets:
+            if (self.x + self.size > rocket.x > self.x - self.size and
+                    self.y + self.size > rocket.y > self.y - self.size):
+                game.rockets.remove(rocket)
+                game.aliens.remove(self)
