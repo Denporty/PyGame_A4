@@ -18,7 +18,6 @@ class Game:
     difficulty = 0
     backgroundColor = (0, 0, 0)
     firstWhile = True
-    # timerExceeded = False
 
     def __init__(self):
         pygame.init()
@@ -27,7 +26,6 @@ class Game:
         done = self.statusGame
         hero = player.Player(self, 600 / 2, 720 - 20)
         generator = Generator(self)
-        # timer = Timer(self)
         while not done:
             done = self.statusGame
             if len(self.aliens) == 0:
@@ -35,13 +33,12 @@ class Game:
                 self.win = True
 
             pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_LEFT]:  # sipka doleva
-                hero.x -= 2 if hero.x > 20 else 0  # leva hranice plochy
-            elif pressed[pygame.K_RIGHT]:  # sipka doprava
-                hero.x += 2 if hero.x < 720 - 20 else 0  # prava hranice
+            if pressed[pygame.K_LEFT]:
+                hero.x -= 2 if hero.x > 20 else 0
+            elif pressed[pygame.K_RIGHT]:
+                hero.x += 2 if hero.x < 720 - 20 else 0
 
             for event in pygame.event.get():
-                # timer.draw(self.timerExceeded)
                 if event.type == pygame.QUIT:
                     self.statusGame = True
                     self.menu = True
@@ -82,7 +79,7 @@ class Game:
                     self.displaySubtitle("3: hard", 425)
                     self.displaySubtitle("4: impossible", 460)
                     pressed = pygame.key.get_pressed()
-                    if pressed[pygame.K_1]:  # sipka doleva
+                    if pressed[pygame.K_1]:
                         self.menu = False
                         self.firstTry = False
                         self.difficulty = 1
@@ -121,16 +118,6 @@ class Game:
         font = pygame.font.SysFont('Arial', 30)
         textsurface = font.render(text, False, variables.WHITE_BACKGROUND)
         self.screen.blit(textsurface, (25, height))
-
-
-# class Timer:
-#     def __init__(self, timer):
-#         self.timer = timer
-#
-#     def draw(self, game):
-#         timer = pygame.time.get_ticks() / 1000
-#         if timer > 10:
-#             game.timerExceeded = True
 
 
 class Generator:
