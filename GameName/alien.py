@@ -1,8 +1,10 @@
 import pygame
+import variables
 
 
 class Alien:
     speed = 0
+    color = variables.BLUE_BACKGROUND
 
     def __init__(self, game, x, y):
         self.x = x
@@ -11,19 +13,20 @@ class Alien:
         self.size = 20
 
     def draw(self, difficulty):
-        pygame.draw.rect(self.game.screen,
-                         (81, 43, 88),
-                         pygame.Rect(self.x, self.y, self.size, self.size))
         if difficulty == 1:
-            self.speed = 0.1
+            self.speed = 0.25
+            self.size = 25
         elif difficulty == 2:
-            self.speed = 0.25
+            self.speed = 0.3
         elif difficulty == 3:
-            self.speed = 0.25
+            self.speed = 0.35
             self.size = 15
         elif difficulty == 4:
-            self.speed = 0.25
+            self.speed = 0.35
             self.size = 10
+        pygame.draw.rect(self.game.screen,
+                         self.color,
+                         pygame.Rect(self.x, self.y, self.size, self.size))
         self.y += self.speed
 
     def checkCollision(self, game):

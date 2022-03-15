@@ -1,4 +1,5 @@
 import pygame
+import variables
 
 
 class Player:
@@ -9,5 +10,5 @@ class Player:
 
     def draw(self):
         pygame.draw.rect(self.game.screen,
-                         (210, 210, 251),
-                         pygame.Rect(self.x, self.y, 8, 5))
+                         variables.WHITE_BACKGROUND,
+                         pygame.Rect(self.x, self.y, 16, 10))
