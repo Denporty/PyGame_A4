@@ -17,7 +17,13 @@ class Alien:
         if difficulty == 1:
             self.speed = 0.1
         elif difficulty == 2:
-            self.speed = 1
+            self.speed = 0.25
+        elif difficulty == 3:
+            self.speed = 0.25
+            self.size = 15
+        elif difficulty == 4:
+            self.speed = 0.25
+            self.size = 10
         self.y += self.speed
 
     def checkCollision(self, game):

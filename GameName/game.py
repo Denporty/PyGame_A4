@@ -13,7 +13,8 @@ class Game:
     win = False
     firstTry = True
     menu = True
-    difficulty: 0
+    difficulty = 0
+    backgroundColor = (0, 0, 0)
 
     def __init__(self):
         module_charge = pygame.init()
@@ -47,7 +48,8 @@ class Game:
 
             pygame.display.update()
             self.clock.tick(60)
-            self.screen.fill((0, 0, 0))
+            if not self.firstTry:
+                self.screen.fill(self.backgroundColor)
             if not self.menu:
                 for alien in self.aliens:
                     alien.draw(self.difficulty)
@@ -71,16 +73,26 @@ class Game:
                     pressed = pygame.key.get_pressed()
                     if pressed[pygame.K_LEFT]:  # sipka doleva
                         self.menu = False
-                        self.statusGame = False
                         self.firstTry = False
                         self.difficulty = 1
                     if pressed[pygame.K_RIGHT]:
                         self.menu = False
-                        self.statusGame = False
                         self.firstTry = False
                         self.difficulty = 2
+                        self.backgroundColor = (255, 178, 102)
+                    if pressed[pygame.K_UP]:
+                        self.menu = False
+                        self.firstTry = False
+                        self.difficulty = 3
+                        self.backgroundColor = (255, 51, 51)
+                    if pressed[pygame.K_DOWN]:
+                        self.menu = False
+                        self.firstTry = False
+                        self.difficulty = 4
+                        self.backgroundColor = (153, 51, 255)
 
                 else:
+                    self.screen.fill((255, 51, 51))
                     self.displayText("Game Over")
                 pygame.display.update()
 
@@ -107,8 +119,12 @@ class Timer:
 
 class Generator:
     def __init__(self, game):
-        margin = 30
-        width = 30
+        if game.difficulty == 4:
+            margin = 20
+            width = 10
+        else:
+            margin = 30
+            width = 30
         for x in range(margin, 600 - margin, width):
             for y in range(margin, int(400 / 2), width):
                 game.aliens.append(alien.Alien(game, x, y))
