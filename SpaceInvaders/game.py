@@ -4,6 +4,9 @@ import player
 import attack
 import variables
 import random
+from random import randrange
+import bonus
+import timer
 
 
 class Game:
@@ -18,6 +21,13 @@ class Game:
     difficulty = 0
     backgroundColor = (0, 0, 0)
     firstWhile = True
+    goTopBonus = False
+    bigRocketBonus = False
+    speedRocketBonus = False
+    bonusSpawn = False
+    bonus = True
+    showBonusWording = False
+    i = 0
 
     def __init__(self):
         pygame.init()
@@ -25,7 +35,9 @@ class Game:
         self.clock = pygame.time.Clock()
         done = self.statusGame
         hero = player.Player(self, 600 / 2, 720 - 20)
-        generator = Generator(self)
+        bonusAppear = bonus.Bonus(self, randrange(600), 0)
+        Generator(self)
+        time = timer.Timer(self)
         while not done:
             done = self.statusGame
             if len(self.aliens) == 0:
@@ -37,8 +49,8 @@ class Game:
                 hero.x -= 2 if hero.x > 20 else 0
             elif pressed[pygame.K_RIGHT]:
                 hero.x += 2 if hero.x < 720 - 20 else 0
-
             for event in pygame.event.get():
+                time.draw(self)
                 if event.type == pygame.QUIT:
                     self.statusGame = True
                     self.menu = True
@@ -53,16 +65,35 @@ class Game:
                 for alien in self.aliens:
                     alien.draw(self.difficulty)
                     alien.checkCollision(self)
+                    if self.goTopBonus:
+                        if self.i < len(self.aliens):
+                            alien.y = alien.y - 30
+                            self.i = self.i + 1
+                        else:
+                            self.i = 0
+                            self.goTopBonus = False
                     if alien.y > 720:
                         self.win = False
                         self.menu = True
                 if not self.lost:
                     hero.draw()
                 for rocket in self.rockets:
-                    rocket.draw(self)
+                    rocket.draw()
+                if self.bonusSpawn:
+                    bonusAppear.draw()
+                    if bonus:
+                        bonusAppear.checkCollision(self)
+                if self.showBonusWording:
+                    if self.bigRocketBonus:
+                        self.displayBonusWording("Big rockets")
+                    elif self.speedRocketBonus:
+                        self.displayBonusWording("Rockets speed")
+                    else:
+                        self.displayBonusWording("Invaders go back")
 
             if self.menu:
-                randomBackground = [variables.GREEN_BACKGROUND, variables.PURPLE_BACKGROUND, variables.RED_BACKGROUND, variables.BLUE_BACKGROUND, variables.ORANGE_BACKGROUND]
+                randomBackground = [variables.GREEN_BACKGROUND, variables.PURPLE_BACKGROUND, variables.RED_BACKGROUND,
+                                    variables.BLUE_BACKGROUND, variables.ORANGE_BACKGROUND]
                 if self.firstWhile:
                     self.screen.fill(random.choice(randomBackground))
                     self.firstWhile = False
@@ -107,17 +138,23 @@ class Game:
                     self.displaySubtitle("Relaunch project for replay", 355)
                 pygame.display.update()
 
-
     def displayText(self, text, height):
         pygame.font.init()
         font = pygame.font.SysFont('impact', 50)
         textsurface = font.render(text, False, variables.WHITE_BACKGROUND)
         self.screen.blit(textsurface, (25, height))
+
     def displaySubtitle(self, text, height):
         pygame.font.init()
         font = pygame.font.SysFont('Arial', 30)
         textsurface = font.render(text, False, variables.WHITE_BACKGROUND)
         self.screen.blit(textsurface, (25, height))
+
+    def displayBonusWording(self, text):
+        pygame.font.init()
+        font = pygame.font.SysFont('impact', 30)
+        textsurface = font.render(text, False, variables.WHITE_BACKGROUND)
+        self.screen.blit(textsurface, (25, 20))
 
 
 class Generator:
