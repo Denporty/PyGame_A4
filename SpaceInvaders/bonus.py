@@ -1,3 +1,4 @@
+import os
 import random
 
 import pygame
@@ -27,12 +28,17 @@ class Bonus:
                     game.rockets.remove(rocket)
                 self.color = variables.RED_BACKGROUND
                 if game.bonus:
-                    choiceBonus = random.choice([1, 2, 3])
+                    choiceBonus = random.choice([1, 2, 3, 4])
                     if choiceBonus == 1:
                         game.goTopBonus = True
                     elif choiceBonus == 2:
                         game.bigRocketBonus = True
                     elif choiceBonus == 3:
                         game.speedRocketBonus = True
+                    elif choiceBonus == 4:
+                        game.doubleRocketBonus = True
                     game.showBonusWording = True
                     game.bonus = False
+                    ouch = pygame.mixer.Sound(os.path.join('assets/bonus.mp3'))
+                    pygame.mixer.Sound.play(ouch)
+                    pygame.mixer.music.play()

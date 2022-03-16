@@ -19,9 +19,20 @@ class Rocket:
                              variables.BLUE_BACKGROUND,
                              pygame.Rect(self.x, self.y, 8, 16))
             self.y += -2
+        elif self.game.speedRocketMalus:
+            pygame.draw.rect(self.game.screen,
+                             variables.BLUE_BACKGROUND,
+                             pygame.Rect(self.x, self.y, 2, 4))
+            self.y += -1
         else:
             pygame.draw.rect(self.game.screen,
                              variables.WHITE_BACKGROUND,
                              pygame.Rect(self.x, self.y, 2, 4))
             self.y += -2
 
+    def drawDoubleRocket(self):
+        if self.game.speedRocketBonus:
+            pygame.draw.rect(self.game.screen,
+                             variables.BLACK_BACKGROUND,
+                             pygame.Rect(self.x+4, self.y, 2, 4))
+            self.y += -6

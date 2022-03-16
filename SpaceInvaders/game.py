@@ -1,5 +1,7 @@
+import os
+
 import pygame
-import alien
+import generator
 import player
 import attack
 import variables
@@ -7,6 +9,7 @@ import random
 from random import randrange
 import bonus
 import timer
+import malus
 
 
 class Game:
@@ -15,6 +18,7 @@ class Game:
     lost = False
     statusGame = False
     rockets = []
+    doublerockets = []
     win = False
     firstTry = True
     menu = True
@@ -27,6 +31,11 @@ class Game:
     bonusSpawn = False
     bonus = True
     showBonusWording = False
+    malusSpawn = False
+    malus = True
+    speedPlayerMalus = False
+    speedRocketMalus = False
+    doubleRocketBonus = False
     i = 0
 
     def __init__(self):
@@ -36,8 +45,11 @@ class Game:
         done = self.statusGame
         hero = player.Player(self, 600 / 2, 720 - 20)
         bonusAppear = bonus.Bonus(self, randrange(600), 0)
-        Generator(self)
-        time = timer.Timer(self)
+        malusAppear = malus.Malus(self, randrange(600), 0)
+        generator.Generator(self)
+        pygame.mixer.init()
+        pygame.mixer.music.load('assets/space-invaders.mp3')
+        pygame.mixer.music.play(-1)
         while not done:
             done = self.statusGame
             if len(self.aliens) == 0:
@@ -46,16 +58,26 @@ class Game:
 
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_LEFT]:
-                hero.x -= 2 if hero.x > 20 else 0
+                if not self.speedPlayerMalus:
+                    hero.x -= 2 if hero.x > 20 else 0
+                else:
+                    hero.x -= 1.5 if hero.x > 20 else 0
             elif pressed[pygame.K_RIGHT]:
-                hero.x += 2 if hero.x < 720 - 20 else 0
+                if not self.speedPlayerMalus:
+                    hero.x += 2 if hero.x < 600 - 20 else 0
+                else:
+                    hero.x += 1.5 if hero.x < 600 - 20 else 0
             for event in pygame.event.get():
-                time.draw(self)
                 if event.type == pygame.QUIT:
                     self.statusGame = True
                     self.menu = True
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not self.lost:
                     self.rockets.append(attack.Rocket(self, hero.x, hero.y))
+                    ouch = pygame.mixer.Sound(os.path.join('assets/rocket.mp3'))
+                    pygame.mixer.Sound.play(ouch)
+                    pygame.mixer.music.play()
+                    if self.doubleRocketBonus:
+                        self.rockets.append(attack.Rocket(self, hero.x + 6, hero.y))
 
             pygame.display.update()
             self.clock.tick(60)
@@ -73,12 +95,20 @@ class Game:
                             self.i = 0
                             self.goTopBonus = False
                     if alien.y > 720:
+                        pygame.mixer.music.load('assets/game-over.mp3')
+                        pygame.mixer.music.play()
                         self.win = False
                         self.menu = True
                 if not self.lost:
+                    time = timer.Timer(self)
+                    time.draw(self)
                     hero.draw()
                 for rocket in self.rockets:
                     rocket.draw()
+                if self.malusSpawn:
+                    malusAppear.draw()
+                    if malus:
+                        malusAppear.checkCollision(self)
                 if self.bonusSpawn:
                     bonusAppear.draw()
                     if bonus:
@@ -88,6 +118,8 @@ class Game:
                         self.displayBonusWording("Big rockets")
                     elif self.speedRocketBonus:
                         self.displayBonusWording("Rockets speed")
+                    elif self.doubleRocketBonus:
+                        self.displayBonusWording("Double rockets")
                     else:
                         self.displayBonusWording("Invaders go back")
 
@@ -155,22 +187,6 @@ class Game:
         font = pygame.font.SysFont('impact', 30)
         textsurface = font.render(text, False, variables.WHITE_BACKGROUND)
         self.screen.blit(textsurface, (25, 20))
-
-
-class Generator:
-    def __init__(self, game):
-        if game.difficulty == 4:
-            margin = 20
-            width = 10
-        elif game.difficulty == 1:
-            margin = 30
-            width = 30
-        else:
-            margin = 30
-            width = 30
-        for x in range(margin, 600 - margin, width):
-            for y in range(margin, int(600 / 2), width):
-                game.aliens.append(alien.Alien(game, x, y))
 
 
 game = Game()

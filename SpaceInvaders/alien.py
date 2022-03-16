@@ -1,3 +1,5 @@
+import os
+
 import pygame
 import variables
 
@@ -35,3 +37,6 @@ class Alien:
                     self.y + self.size > rocket.y > self.y - self.size):
                 game.rockets.remove(rocket)
                 game.aliens.remove(self)
+                ouch = pygame.mixer.Sound(os.path.join('assets/destroy.mp3'))
+                pygame.mixer.Sound.play(ouch)
+                pygame.mixer.music.play(-1)
