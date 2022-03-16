@@ -36,6 +36,9 @@ class Game:
     speedPlayerMalus = False
     speedRocketMalus = False
     doubleRocketBonus = False
+    winSound = False
+    dashEnableLeft = True
+    dashEnableRight = True
     i = 0
 
     def __init__(self):
@@ -51,27 +54,41 @@ class Game:
         pygame.mixer.music.load('assets/space-invaders.mp3')
         pygame.mixer.music.play(-1)
         while not done:
+            self.clock.tick(60)
             done = self.statusGame
             if len(self.aliens) == 0:
                 self.menu = True
                 self.win = True
+                if self.winSound:
+                    victory = pygame.mixer.Sound(os.path.join('assets/victory.mp3'))
+                    pygame.mixer.Sound.play(victory)
+                    pygame.mixer.music.play()
+                    self.clock.tick(0)
 
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_LEFT]:
                 if not self.speedPlayerMalus:
                     hero.x -= 2 if hero.x > 20 else 0
                 else:
-                    hero.x -= 1.5 if hero.x > 20 else 0
+                    hero.x -= 1.8 if hero.x > 20 else 0
             elif pressed[pygame.K_RIGHT]:
                 if not self.speedPlayerMalus:
                     hero.x += 2 if hero.x < 600 - 20 else 0
                 else:
                     hero.x += 1.5 if hero.x < 600 - 20 else 0
+            if self.dashEnableRight:
+                if pressed[pygame.K_d]:
+                    hero.x = hero.x + 100 if hero.x > 20 else 0
+                    self.dashEnableRight = False
+            if self.dashEnableLeft:
+                if pressed[pygame.K_q]:
+                    hero.x = hero.x - 100 if hero.x < 600 - 20 else 0
+                    self.dashEnableLeft = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.statusGame = True
                     self.menu = True
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not self.lost:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not self.lost and not self.menu:
                     self.rockets.append(attack.Rocket(self, hero.x, hero.y))
                     ouch = pygame.mixer.Sound(os.path.join('assets/rocket.mp3'))
                     pygame.mixer.Sound.play(ouch)
@@ -80,7 +97,6 @@ class Game:
                         self.rockets.append(attack.Rocket(self, hero.x + 6, hero.y))
 
             pygame.display.update()
-            self.clock.tick(60)
             if not self.firstTry:
                 self.screen.fill(self.backgroundColor)
             if not self.menu:
@@ -100,8 +116,8 @@ class Game:
                         self.win = False
                         self.menu = True
                 if not self.lost:
-                    time = timer.Timer(self)
-                    time.draw(self)
+                    wait = timer.Timer(self)
+                    wait.draw(self)
                     hero.draw()
                 for rocket in self.rockets:
                     rocket.draw()
@@ -133,6 +149,7 @@ class Game:
                     self.screen.fill(variables.GREEN_BACKGROUND)
                     self.displayText("GG! Thanks for playing", 260)
                     self.displaySubtitle("Relaunch project for replay", 360)
+                    self.winSound = True
 
                 elif self.firstTry:
                     self.displayText("Welcome", 220)

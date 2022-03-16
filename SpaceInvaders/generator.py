@@ -1,5 +1,6 @@
 import alien
 
+
 class Generator:
     def __init__(self, game):
         if game.difficulty == 4:
