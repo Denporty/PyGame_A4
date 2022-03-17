@@ -10,6 +10,7 @@ from random import randrange
 import bonus
 import timer
 import malus
+import text
 
 
 class Game:
@@ -31,6 +32,7 @@ class Game:
     bonusSpawn = False
     bonus = True
     showBonusWording = False
+    showMalusWording = False
     malusSpawn = False
     malus = True
     speedPlayerMalus = False
@@ -50,6 +52,7 @@ class Game:
         bonusAppear = bonus.Bonus(self, randrange(600), 0)
         malusAppear = malus.Malus(self, randrange(600), 0)
         generator.Generator(self)
+        textSpawn = text.Text(self)
         pygame.mixer.init()
         pygame.mixer.music.load('assets/space-invaders.mp3')
         pygame.mixer.music.play(-1)
@@ -60,11 +63,8 @@ class Game:
                 self.menu = True
                 self.win = True
                 if self.winSound:
-                    victory = pygame.mixer.Sound(os.path.join('assets/victory.mp3'))
-                    pygame.mixer.Sound.play(victory)
-                    pygame.mixer.music.play()
+                    pygame.mixer.Sound.play(pygame.mixer.Sound(os.path.join('assets/victory.mp3'))) and pygame.mixer.music.play()
                     self.clock.tick(0)
-
             pressed = pygame.key.get_pressed()
             if pressed[pygame.K_LEFT]:
                 if not self.speedPlayerMalus:
@@ -90,12 +90,9 @@ class Game:
                     self.menu = True
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not self.lost and not self.menu:
                     self.rockets.append(attack.Rocket(self, hero.x, hero.y))
-                    ouch = pygame.mixer.Sound(os.path.join('assets/rocket.mp3'))
-                    pygame.mixer.Sound.play(ouch)
-                    pygame.mixer.music.play()
+                    pygame.mixer.Sound.play(pygame.mixer.Sound(os.path.join('assets/rocket.mp3'))) and pygame.mixer.music.play()
                     if self.doubleRocketBonus:
                         self.rockets.append(attack.Rocket(self, hero.x + 6, hero.y))
-
             pygame.display.update()
             if not self.firstTry:
                 self.screen.fill(self.backgroundColor)
@@ -129,36 +126,45 @@ class Game:
                     bonusAppear.draw()
                     if bonus:
                         bonusAppear.checkCollision(self)
+                if self.dashEnableLeft:
+                    textSpawn.displayDashWording("Left dash", variables.WHITE_BACKGROUND, 20)
+                else:
+                    textSpawn.displayDashWording("Left dash", variables.BLACK_BACKGROUND, 20)
+                if self.dashEnableRight:
+                    textSpawn.displayDashWording("Right dash", variables.WHITE_BACKGROUND, 60)
+                else:
+                    textSpawn.displayDashWording("Right dash", variables.BLACK_BACKGROUND, 60)
+                if self.showMalusWording:
+                    if self.speedPlayerMalus:
+                        textSpawn.displayMalusWording("Slow player")
+                    elif self.speedRocketMalus:
+                        textSpawn.displayMalusWording("Slow rockets")
                 if self.showBonusWording:
                     if self.bigRocketBonus:
-                        self.displayBonusWording("Big rockets")
+                        textSpawn.displayBonusWording("Big rockets")
                     elif self.speedRocketBonus:
-                        self.displayBonusWording("Rockets speed")
+                        textSpawn.displayBonusWording("Rockets speed")
                     elif self.doubleRocketBonus:
-                        self.displayBonusWording("Double rockets")
+                        textSpawn.displayBonusWording("Double rockets")
                     else:
-                        self.displayBonusWording("Invaders go back")
-
+                        textSpawn.displayBonusWording("Invaders go back")
             if self.menu:
-                randomBackground = [variables.GREEN_BACKGROUND, variables.PURPLE_BACKGROUND, variables.RED_BACKGROUND,
-                                    variables.BLUE_BACKGROUND, variables.ORANGE_BACKGROUND]
+                randomBackground = [variables.GREEN_BACKGROUND, variables.PURPLE_BACKGROUND, variables.RED_BACKGROUND, variables.BLUE_BACKGROUND, variables.ORANGE_BACKGROUND]
                 if self.firstWhile:
                     self.screen.fill(random.choice(randomBackground))
                     self.firstWhile = False
                 if self.win:
                     self.screen.fill(variables.GREEN_BACKGROUND)
-                    self.displayText("GG! Thanks for playing", 260)
-                    self.displaySubtitle("Relaunch project for replay", 360)
+                    textSpawn.displayText("GG! Thanks for playing", 260)
+                    textSpawn.displaySubtitle("Relaunch project for replay", 360)
                     self.winSound = True
-
                 elif self.firstTry:
-                    self.displayText("Welcome", 220)
-                    self.displaySubtitle("Select difficulty:", 320)
-                    self.displaySubtitle("1: easy", 355)
-                    self.displaySubtitle("2: normal", 390)
-                    self.displaySubtitle("3: hard", 425)
-                    self.displaySubtitle("4: impossible", 460)
-                    pressed = pygame.key.get_pressed()
+                    textSpawn.displayText("Welcome", 220)
+                    textSpawn.displaySubtitle("Select difficulty:", 320)
+                    textSpawn.displaySubtitle("1: easy", 355)
+                    textSpawn.displaySubtitle("2: normal", 390)
+                    textSpawn.displaySubtitle("3: hard", 425)
+                    textSpawn.displaySubtitle("4: impossible", 460)
                     if pressed[pygame.K_1]:
                         self.menu = False
                         self.firstTry = False
@@ -179,31 +185,12 @@ class Game:
                         self.firstTry = False
                         self.difficulty = 4
                         self.backgroundColor = variables.PURPLE_BACKGROUND
-
                 else:
                     self.screen.fill(variables.RED_BACKGROUND)
-                    self.displayText("Game Over", 220)
-                    self.displaySubtitle("The invaders have got you", 320)
-                    self.displaySubtitle("Relaunch project for replay", 355)
+                    textSpawn.displayText("Game Over", 220)
+                    textSpawn.displaySubtitle("The invaders have got you", 320)
+                    textSpawn.displaySubtitle("Relaunch project for replay", 355)
                 pygame.display.update()
-
-    def displayText(self, text, height):
-        pygame.font.init()
-        font = pygame.font.SysFont('impact', 50)
-        textsurface = font.render(text, False, variables.WHITE_BACKGROUND)
-        self.screen.blit(textsurface, (25, height))
-
-    def displaySubtitle(self, text, height):
-        pygame.font.init()
-        font = pygame.font.SysFont('Arial', 30)
-        textsurface = font.render(text, False, variables.WHITE_BACKGROUND)
-        self.screen.blit(textsurface, (25, height))
-
-    def displayBonusWording(self, text):
-        pygame.font.init()
-        font = pygame.font.SysFont('impact', 30)
-        textsurface = font.render(text, False, variables.WHITE_BACKGROUND)
-        self.screen.blit(textsurface, (25, 20))
 
 
 game = Game()

@@ -36,5 +36,6 @@ class Malus:
                     ouch = pygame.mixer.Sound(os.path.join('assets/malus.mp3'))
                     pygame.mixer.Sound.play(ouch)
                     pygame.mixer.music.play()
+                    game.showMalusWording = True
                     game.malus = False
                 self.color = variables.RED_BACKGROUND

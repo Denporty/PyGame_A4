@@ -18,7 +18,10 @@ class Rocket:
             pygame.draw.rect(self.game.screen,
                              variables.BLUE_BACKGROUND,
                              pygame.Rect(self.x, self.y, 8, 16))
-            self.y += -2
+            if self.game.speedRocketMalus:
+                self.y += -1
+            else:
+                self.y += -2
         elif self.game.speedRocketMalus:
             pygame.draw.rect(self.game.screen,
                              variables.BLUE_BACKGROUND,
